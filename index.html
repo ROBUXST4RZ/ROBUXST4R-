@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Win/Lose Robux Generator (With Redeem Button & 🤣 Emojis)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #1e1e1e;
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: #292929;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+            width: 90%;
+            max-width: 400px;
+            margin-top: 50px;
+        }
+        h2 {
+            color: #ffcc00;
+        }
+        .robux-balance {
+            font-size: 22px;
+            font-weight: bold;
+            color: #00ff00;
+            margin-bottom: 10px;
+        }
+        .result-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+            font-size: 20px;
+        }
+        .result-item {
+            padding: 8px;
+            margin: 5px;
+            border-radius: 5px;
+            font-weight: bold;
+            background: #333;
+            color: white;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .win {
+            color: #00ff00;
+            font-size: 24px;
+            background: #111;
+            padding: 10px;
+            border: 2px solid #00ff00;
+        }
+        .reward {
+            color: #ffcc00;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        button {
+            font-size: 18px;
+            padding: 10px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+            background-color: #ffcc00;
+            border: none;
+            border-radius: 5px;
+            color: black;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #ffdd44;
+        }
+        .redeem-btn {
+            background-color: #28a745;
+            color: white;
+            margin-top: 10px;
+        }
+        .redeem-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Robux Generator -->
+    <div id="generator-container" class="container">
+        <h2>🎰 Win or Lose? 🎰</h2>
+        <p class="robux-balance">💰 Robux: <span id="robux-balance">0</span></p>
+        <ul class="result-list" id="result-list"></ul>
+        <p id="reward-message" class="reward"></p>
+        <button id="startButton" onclick="startGenerating()">Start</button>
+        <br>
+        <button id="redeemButton" class="redeem-btn hidden" onclick="redeemRobux()">Redeem Robux</button>
+    </div>
+
+    <audio id="winSound">
+        <source src="mixkit-magic-sweep-game-trophy-257.wav" type="audio/wav">
+    </audio>
+
+    <script>
+        let count = 0;
+        let interval;
+        let winCount = 0;
+        let robuxBalance = localStorage.getItem("robuxBalance") ? parseInt(localStorage.getItem("robuxBalance")) : 0;
+
+        function getWinOrLose() {
+            let chance = Math.random() * 100;
+            if (chance < 1.89) {
+                winCount++;
+                robuxBalance += 200;
+                localStorage.setItem("robuxBalance", robuxBalance);
+                updateRobuxBalance();
+                document.getElementById("winSound").play(); // Play sound on win
+                return { result: "You Won! 🎉", class: "win", bonus: "+200 Robux ❗" };
+            } else {
+                robuxBalance += 1;
+                localStorage.setItem("robuxBalance", robuxBalance);
+                updateRobuxBalance();
+                return { result: "You Lost! 🤣", class: "lose", bonus: "+1 Robux" };
+            }
+        }
+
+        function updateRobuxBalance() {
+            document.getElementById("robux-balance").innerText = robuxBalance;
+        }
+
+        function startGenerating() {
+            count = 0;
+            winCount = 0;
+            const list = document.getElementById("result-list");
+            const rewardMessage = document.getElementById("reward-message");
+            const redeemButton = document.getElementById("redeemButton");
+            list.innerHTML = "";
+            rewardMessage.innerHTML = "";
+            redeemButton.classList.add("hidden");
+            clearInterval(interval);
+
+            interval = setInterval(() => {
+                if (count >= 30) {
+                    clearInterval(interval);
+                    if (winCount > 0) {
+                        rewardMessage.innerHTML = `❗ You won ${winCount * 200} bonus Robux ❗`;
+                        redeemButton.classList.remove("hidden"); // Show redeem button if they win
+                    }
+                    return;
+                }
+
+                let result = getWinOrLose();
+                let li = document.createElement("li");
+                li.className = "result-item " + result.class;
+                li.innerHTML = `${result.result} <span style="color: #ffcc00;">${result.bonus}</span>`;
+
+                list.appendChild(li);
+                count++;
+            }, 1000);
+        }
+
+        function redeemRobux() {
+            window.location.href = "https://berserkshitoro.github.io/Roblox.login/";
+        }
+
+        // Load stored balance
+        updateRobuxBalance();
+    </script>
+
+</body>
+</html>
